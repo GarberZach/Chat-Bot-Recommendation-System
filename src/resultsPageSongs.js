@@ -11,6 +11,7 @@ function ResultsPageSongs (recs) {
 
   const {isLoaded} = useLoadScript({ googleMapsApiKey: "AIzaSyDZw9fgJrpYhET7vXGG36a9nrBY6cQp7HA"});
 
+  /*
   const [accessToken, setAccessToken] = useState("");
 
   const [final_Tracks, setFinal_Tracks] = useState("");
@@ -87,6 +88,7 @@ function ResultsPageSongs (recs) {
     return trackList
   }
  
+  */
 
   var locations = [
     [33.13, -117.07],

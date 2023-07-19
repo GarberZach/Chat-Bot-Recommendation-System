@@ -6,6 +6,7 @@
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 import pandas as pd
+import os
 
 # connect to the localhost
 es = Elasticsearch("http://localhost:9200")
@@ -15,9 +16,10 @@ print(es.info().body)
 
 # command to delete an index
 # es.indices.delete(index='songs')
-
+print(os.getcwd())
+print("@@@@@@@@@@@@@@@@@@")
 df = (
-    pd.read_csv("esTest-main\song_data_v4.csv")
+    pd.read_csv(".\src\esTest-main\song_data_v4.csv")
     # drop missing values
     .dropna()
     # only adding 5000 of the entries.
