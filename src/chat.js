@@ -1,6 +1,6 @@
 import React from "react";
 // import ChatFeed from "react-chat-ui";/
-import { ChatFeed, ChatBubble, BubbleGroup, Message } from "react-chat-ui";
+import { ChatFeed, ChatBubble, BubbleGroup, Message } from "./src/react-chat-ui";
 
 const styles = {
   button: {

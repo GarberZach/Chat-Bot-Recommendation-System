@@ -28,7 +28,7 @@ def prompt_input():
     
     #print(request.json, file=sys.stderr)
     songs = execElasticSearch(request.json)
-    print(songs)
+    print(songs) 
     
     return {"songList": songs}
 

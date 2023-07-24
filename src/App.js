@@ -2,7 +2,7 @@ import React from "react";
 import "./styles.css";
 import { Message, ChatFeed } from "./react-chat-ui";
 import Form from "./form";
-import apiManager from "./api.js"
+import getPrompt from "./getPrompt.js"
 import { useState, useEffect } from "react";
 
 import ResultsPageSongs from "./resultsPageSongs";
@@ -39,18 +39,16 @@ class Chat extends React.Component {
 
     super();
     this.POSTsender = require('./postAnswers').default;
-    const APIManager = require('./api').default;
-    APIManager().then(data => {
-      this.prompts = data
-      
-    });
+    this.musicEsStarter = require('./startMusicES').default;
+    
+   
 
     this.promptNum = -1;
-    this.inputs = {answers: []};
+    this.input = {answers: String};
     
     this.state = {
       messages: [
-        new Message({ id: "0", message: "say hi to nella", senderName: "Nella" }),
+        new Message({ id: "0", message: " '1' for spotify \n'2' for housing", senderName: "Nella" }),
         
       ],
       useCustomBubble: false,
@@ -60,16 +58,41 @@ class Chat extends React.Component {
     this.chatState = true;
     this.resultsState = false;
     this.recommendations = [];
+    this.introPromptFlag = true;
     
+    this.housingMode = false;
+    this.musicMode = false;
+
+    this.musicEsStarter().then(
+      ()=>console.log("ES-Music Started"));
 
   }
+
+  fetchPrompt(){
+    const prompt = require('./getPrompt').default;
+    prompt().then(data => {
+
+      //add prompt to chatfeed
+      this.state.curr_user = 2
+      const prevState = this.state;
+
+      const newMessage = new Message({
+      id: this.state.curr_user,
+      message: data["prompt"],
+      senderName: "Nella",
+     
+    });
+    prevState.messages.push(newMessage);
+    this.setState(this.state);
+    });
+  }
+
 
   onPress(user) {
     this.setState({ curr_user: user });
   }
 
   pushSong(song){
-
     this.state.curr_user = 2
     const prevState = this.state;
     const newMessage = new Message({
@@ -80,105 +103,90 @@ class Chat extends React.Component {
     });
     prevState.messages.push(newMessage);
     this.setState(this.state);
+  }
+
+  sendAnswer(){
+    this.POSTsender(this.input)
+      .then(data => { 
+        this.recommendations = data;
+
+        this.chatState = false;
+        this.resultsState = false;
+        this.fetchPrompt();
+      })
+      
 
   }
-/*
-  onMessageSubmit(e) {
-    
-    const input = this.message;
-    e.preventDefault();
-    if (!input.value) {
-      return false;
-    }
-    this.pushMessage(this.state.curr_user, input.value);
-    return true;
-  }
-*/
- 
-respond(){
-  
-  this.promptNum = this.promptNum + 1;
-  if(this.promptNum === 8){
-    this.POSTsender(this.inputs).then(data => {
-      this.pushSong("Here are some songs you may like")
-      data.songList.forEach(song => this.pushSong(song))
-      data.songList.forEach(song => this.recommendations.push(song))
-    });
 
-    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-    console.log(this.recommendations);
-    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
-    this.chatState = false;
-    this.resultsState = true;
-    
-  }
-  
-  this.state.curr_user = 2
-  const prevState = this.state;
-  const newMessage = new Message({
-    id: this.state.curr_user,
-    message: this.prompts.prompts[this.promptNum],
-    senderName: "Nella",
-   
-  });
-  prevState.messages.push(newMessage);
-  this.setState(this.state);
-}
 
+  //Called on form submit in form.js
   pushMessage(recipient, message) {
     
-    
-    this.state.curr_user = 0
+    //add to chat feed
+    this.state.curr_user = 0;
+
     const prevState = this.state;
+
     const newMessage = new Message({
       id: this.state.curr_user,
       message,
       senderName: "You",
-     
     });
+
     prevState.messages.push(newMessage);
     this.setState(this.state);
 
-    if(this.promptNum !== -1){
-      this.inputs.answers.push(message)
-    }
+    //return message to backend
+    if(this.introPromptFlag == false){
+      this.input.answers = message;
+      this.sendAnswer()
+    } else
+      {
+
+        this.introPromptFlag = false;
+        if(message === "1"){
+          this.musicMode = true;
+        }
+        else if(message == "2"){
+          this.housingMode = true;
+
+        }else{
+          console.log("invalid intial response");
+        }
+        this.fetchPrompt();
       
-    this.respond();
+      }
+    
   }
 
   
 
   render() {
 
-    if (this.resultsState){
-      return(
-        <ResultsPageSongs recs = {this.recommendations}>
-
-        </ResultsPageSongs>
-        
-        
-      )
-    }
-
     return (
-<div className="container">
-  <div>
-    <h1>
-      Nella's Rocommendations
-    </h1>
-  </div>
-    <div className="chatfeed-wrapper">
-      <ChatFeed
-        chatBubble={this.state.useCustomBubble}
-        messages={this.state.messages} // Boolean: list of message objects
-        showSenderName
-       />
-    </div>
+<div class="parent"> 
+  <ResultsPageSongs recs = {this.recommendations}>
+
+  </ResultsPageSongs>  
+  <div className="container">
     <div>
-      <Form chat = {this}></Form>
+      <h1>
+        Nella's Rocommendations
+      </h1>
     </div>
-  </div>
+      <div className="chatfeed-wrapper">
+        <ChatFeed
+          chatBubble={this.state.useCustomBubble}
+          messages={this.state.messages} // Boolean: list of message objects
+          showSenderName
+        />
+      </div>
+      <div>
+        <Form chat = {this}></Form>
+      </div>
+    </div>
+  </div>   
       
     );
   }

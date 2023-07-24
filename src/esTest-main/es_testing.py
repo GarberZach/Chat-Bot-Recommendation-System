@@ -5,6 +5,7 @@ from elasticsearch.helpers import bulk
 import pandas as pd
 from interface import Interface
 from query_form import build_query
+from spotify import Spotify
 
 def execElasticSearch(inputs):
     es = Elasticsearch("http://localhost:9200")
@@ -36,9 +37,11 @@ def execElasticSearch(inputs):
     for x in range(len(resp.body["hits"]["hits"])):
        songList.append(resp.body["hits"]["hits"][x]["_source"]["track_id"])
 
-    print("#######################################################################")
-    print(resp.body)
-    print("#######################################################################")
 
-    return songList
+
+    spotify = Spotify(songList)
+    songs = spotify.search_ids()
+
+
+    return (songs)
     
