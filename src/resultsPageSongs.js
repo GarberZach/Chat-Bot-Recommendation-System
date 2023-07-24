@@ -34,6 +34,8 @@ function ResultsPageSongs (recs) {
 
   if(recs.recs.length == 0) return <div class="table-wrapper"><p>No Recommendations</p></div>
   if(!isLoaded) return <div>Loading...</div>
+  console.log("-----------------------------------")
+  console.log(recommendations);
   return(
     
     

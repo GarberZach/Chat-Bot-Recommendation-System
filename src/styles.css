@@ -19,7 +19,12 @@ h2 {
   border: 1px solid black;
   margin: 1rem;
   padding: 2rem 2rem;
-  text-align: center;
+  flex-grow: 2;
+  
+  display: flex;
+  justify-content: space-around;
+  flex-flow: row wrap;
+  align-items: stretch;
 }
 .container {
   max-width: 850px;
@@ -27,7 +32,7 @@ h2 {
   margin-top: 10px;
   background: white;
   display: inline-block;
-  vertical-align: middle;
+  
 }
 
 .install {
@@ -49,7 +54,8 @@ input {
   border-right: 1px solid #ddd;
   font-size: 16px;
   padding: 30px;
-  width: 100%;
+  width: 80%;
+  display: inline-block;
 }
 
 /* CSS */
@@ -128,7 +134,7 @@ input:focus {
 }
 
 .messagge-input{
-  max-width: 850px;
+  max-width: 30%;
   margin: 0 auto;
   display: inline-block;
   

@@ -4,6 +4,7 @@ import { Message, ChatFeed } from "./react-chat-ui";
 import Form from "./form";
 import getPrompt from "./getPrompt.js"
 import { useState, useEffect } from "react";
+import Card_layout from "./Card_layout";
 
 import ResultsPageSongs from "./resultsPageSongs";
 const styles = {
@@ -166,9 +167,10 @@ class Chat extends React.Component {
 
     return (
 <div class="parent"> 
-  <ResultsPageSongs recs = {this.recommendations}>
 
-  </ResultsPageSongs>  
+  <Card_layout recs= {this.recommendations}>
+    
+    </Card_layout> 
   <div className="container">
     <div>
       <h1>
