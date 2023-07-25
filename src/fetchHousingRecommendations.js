@@ -1,15 +1,15 @@
-export default async function postAnswers(input){
+export default async function fetchHousingRecommendations(input){
 
     const settings = {
-        method: 'POST',
+        method: 'GET',
         headers: {
-            Accept: 'application/json',
+            
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(input)
     }
     
-    const response = await fetch('http://localhost:3001/input', settings);
+    const response = await fetch('http://localhost:8090/fetch_recommendations', settings);
     const data = await response.json();
 
     return data

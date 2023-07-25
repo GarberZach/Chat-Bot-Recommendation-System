@@ -1,5 +1,5 @@
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 from prompt_manager import PromptManager
 from es_execute import  execute
@@ -24,33 +24,37 @@ def execute_es():
 
     resp = {"prompt": "es started"}
 
-    return resp
+    return jsonify(resp)
 
 
-@app.route("/get_prompt", methods=["GET"])
+@app.route("/get_prompt", methods=["POST"])
 def get_prompt():
 
-    prompt = promptManager.get_current_prompt()
+
+    request_obj = request.get_json(force=True)
+    
+    promptManager.response = request_obj
+    prompt = promptManager.prompt_user()
+   
+    print("-------------------")
+    print(promptManager.attributes)
+    
 
     jsonData = {"prompt": prompt}
     print(jsonData)
 
-    return jsonData
+    return jsonify(jsonData)
 
-@app.route("/input", methods=["POST"])
+@app.route("/fetch_recommendations", methods=["GET"])
 def receive_input():
-    response = request.json
-    print(response["answers"])
-    promptManager.response = response["answers"]
-    promptManager.prompt_user()
+
 
     songList = execute(prompt_man=promptManager, es_man=es_instance)
-    promptManager.prompt_number = promptManager.prompt_number + 1
+    print('___________________fetch_______________________')
 
     spotify = Spotify(songList)
-    print(spotify)
     songs = spotify.search_ids()
-    return songs
+    return jsonify(songs)
 
 
 if __name__  == "__main__":
