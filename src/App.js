@@ -5,7 +5,7 @@ import Form from "./form";
 import getPrompt from "./getMusicPrompt.js"
 import { useState, useEffect } from "react";
 import Card_layout from "./Card_layout";
-import Card_layout_housing from "./Card_layout_housing";
+import Card_layout_music from "./Card_layout_music";
 
 import ResultsPageSongs from "./resultsPageSongs";
 const styles = {
@@ -41,6 +41,7 @@ class Chat extends React.Component {
 
     super();
     this.musicEsStarter = require('./startMusicES').default;
+    this.introIntent = require('./getIntroIntent').default;
 
     this.fetchMusicRecs = require('./fetchMusicRecommendations').default;
     this.fetchHousingRecs = require('./fetchHousingRecommendations').default;
@@ -48,8 +49,9 @@ class Chat extends React.Component {
     this.getHousingPrompt = require('./getHousingPrompt').default;
     this.getMusicPrompt = require('./getMusicPrompt').default;
    
-
+    this.mode = "";
     
+    this.introInput = {"message": String};
     this.input = {"message": String};
     
     this.state = {
@@ -58,7 +60,8 @@ class Chat extends React.Component {
         
       ],
       useCustomBubble: false,
-      curr_user: 0
+      curr_user: 0,
+      mode: 'neither'
     };
 
     this.chatState = true;
@@ -68,9 +71,10 @@ class Chat extends React.Component {
     this.prompt_number = 0;
     this.housingMode = false;
     this.musicMode = false;
-
+    
     this.musicEsStarter().then(
       ()=>console.log("ES-Music Started"));
+      
 
   }
 
@@ -145,6 +149,19 @@ class Chat extends React.Component {
       }
     }
 
+    setpromptType(input){
+
+        if(input == "housing"){
+          this.housingMode = true;
+
+        }
+        if(input == "music"){
+          this.musicMode = true
+        }
+
+        
+    }
+
     
 
 
@@ -173,21 +190,30 @@ class Chat extends React.Component {
         //this.sendAnswer()
         this.introPromptFlag = false;
         
-        if(message === "1"){
-          this.musicMode = true;
-        }
-        else if(message == "2"){
-          this.housingMode = true;
+        
+      // this.introIntent(this.input)
+      //   .then(data => (
+      //     this.mode = data
+         
+          
+      //   ))
+        
+      //   console.log(this.mode);
 
-        }else{
-          console.log("invalid intial response");
-        }
+      if(message == "1"){
+        this.musicMode = true
+      }
+      if(message == "2"){
+        this.housingMode = true
+      }
+
+
       } else{
-        if(this.prompt_number > 2){
+        if(this.prompt_number > 1){
           this.sendAnswer();
         }
       }
-      console.log(this.input)
+      
       this.fetchPrompt(this.input);
       
       
@@ -198,33 +224,65 @@ class Chat extends React.Component {
 
     render() {
 
-      return (
-  <div class="parent"> 
-  
-
-    <Card_layout recs= {this.recommendations}>
-      
-      </Card_layout> 
-    <div className="container">
-      <div>
-        <h1>
-          Nella's Rocommendations
-        </h1>
-      </div>
-        <div className="chatfeed-wrapper">
-          <ChatFeed
-            chatBubble={this.state.useCustomBubble}
-            messages={this.state.messages} // Boolean: list of message objects
-            showSenderName
-          />
-        </div>
-        <div>
-          <Form chat = {this}></Form>
-        </div>
-      </div>
-    </div>   
+      if (this.housingMode){
+        return (
+          <div class="parent"> 
+          
+            <div className="container">
+            <Card_layout recs= {this.recommendations}>
+              
+              </Card_layout>
+            </div>
+         
+            <div className="container">
         
-      );
+                <div className="chatfeed-wrapper">
+                  <ChatFeed
+                    chatBubble={this.state.useCustomBubble}
+                    messages={this.state.messages} // Boolean: list of message objects
+                    showSenderName
+                  />
+                </div>
+                <div>
+                  <Form chat = {this}></Form>
+                </div>
+              </div>
+            </div>   
+                
+              );
+      }
+
+      else{
+        return (
+          <div class="parent"> 
+          
+            <div className="container">
+            <Card_layout_music recs= {this.recommendations}>
+              
+              </Card_layout_music>
+            </div>
+         
+            <div className="container">
+        
+                <div className="chatfeed-wrapper">
+                  <ChatFeed
+                    chatBubble={this.state.useCustomBubble}
+                    messages={this.state.messages} // Boolean: list of message objects
+                    showSenderName
+                  />
+                </div>
+                <div>
+                  <Form chat = {this}></Form>
+                </div>
+              </div>
+            </div>   
+                
+              );
+      }
+
+     
+
+      
     }
 }
 

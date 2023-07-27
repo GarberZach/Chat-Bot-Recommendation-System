@@ -53,6 +53,7 @@ def receive_input():
     print('___________________fetch_______________________')
 
     spotify = Spotify(songList)
+    print(songList)
     songs = spotify.search_ids()
     return jsonify(songs)
 
