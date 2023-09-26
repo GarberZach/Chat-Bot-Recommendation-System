@@ -1,4 +1,4 @@
-# Nella
+# ChatBot Recommendation System 
 ## Installation
 
 ### Install all packages:
