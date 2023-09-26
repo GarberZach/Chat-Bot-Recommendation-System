@@ -43,7 +43,7 @@ class ESManager:
         """
 
         df = (
-            pd.read_csv("./song_data_v4.csv")
+            pd.read_csv(".src/song_data_v4.csv")
             # drop missing values
             .dropna()
             .reset_index()

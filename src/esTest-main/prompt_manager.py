@@ -119,7 +119,7 @@ class PromptManager:
     def __init__(self):
         self.attributes = []
         self.explicit = True
-        self.popular_sort = True
+        self.popular_sort = False
         self.find_song = False
         self.prompt_number = 0
         self.continue_flag  = True
@@ -132,21 +132,25 @@ class PromptManager:
     def get_current_prompt(self):
 
         prompt = "Please see recommendations on the left"
-        if self.prompt_number < 5:
+        if self.prompt_number < 7:
             match self.prompt_number:
                 case 0:
-                    prompt = random.sample(prompts["intro"], 1)[0] + "\n" + random.sample(prompts["explicit"], 1)[0]
+                    prompt = random.sample(prompts["intro"], 1)[0]
                 case 1:
-                    prompt = random.sample(prompts["popularity"], 1)[0]
+                    prompt = random.sample(prompts["explicit"], 1)[0]
                 case 2:
-                    prompt = random.sample(prompts["specifics"], 1)[0]
+                    prompt = random.sample(prompts["popularity"], 1)[0]
                 case 3:
-                    prompt = "Would you like to continue narrowing your search or search with just the current parameters you have given?"
+                    prompt = random.sample(prompts["specifics"], 1)[0]
                 case 4:
+                    prompt = "Would you like to continue narrowing your search or search with just the current parameters you have given?"
+                case 5:
                     if self.continue_flag:
                         prompt = "What do you want from this song?"
                     else:
                         prompt = "Please see recommendations on the left"
+
+        self.prompt_number = self.prompt_number + 1
 
         
         return prompt
@@ -159,20 +163,26 @@ class PromptManager:
         :return: None
         """
         # TODO: FRONT END HANDLES INTRO PROMPT
-        print("test")
-        if self.prompt_number < 5: 
-            print("IF")
+        
+        if self.prompt_number < 7: 
+            print(str(self.prompt_number) + '@@@@@@@@@@@@@')
             match self.prompt_number:
                 case 0:
+                    print("one")
+                case 1:
+                    print("two")
+                case 2:
                     print(self.attributes)
                     explicit_att = self.explicit_prompt()
+                    print("###############")
+                    print(explicit_att)
                     if explicit_att:
                         self.explicit = False
                         self.attributes.append(explicit_att)
                         print(self.attributes)
-                case 1:
+                case 3:
                     self.popular_sort = self.popularity_prompt()
-                case 2:
+                case 4:
                     s_list = self.specifics_prompt()
                     if s_list:
                         
@@ -180,15 +190,18 @@ class PromptManager:
                             if attribute["attribute"] == "track_name":
                                 self.find_song = True
                             self.attributes.append(attribute)
-                case 3:
+                case 5:
                     self.continue_flag = self.continue_prompt()
-                case 4:
+                case 6:
                     if(self.continue_flag):
                         #feels prompt             
                         att_list = self.feels_prompt()
                         if(att_list):
                             for attribute in att_list: 
                                 self.attributes.append(attribute)
+
+        return self.get_current_prompt()
+        
 
        
         
@@ -213,7 +226,9 @@ class PromptManager:
         :return: a dictionary saying the explicit attribute is false when users enter no, and None when yes is entered
         """
         print(random.sample(prompts["explicit"], 1)[0])
-        explicit = self.response
+
+        print(self.response['message'])
+        explicit = self.response['message']
         llm_prompt = "Identify whether the response that is delimited by the triple backticks indicates that explicit music is allowed or not allowed based on whether the response is positive or negative. " \
                     "A positive response indicates explicit music is allowed, a negative response means explicit music is not allowed. " \
                     "Format the response as a json string in the following format: {\"explicit\": EXPLICIT} where EXPLICIT is either true or false. " \
@@ -249,7 +264,7 @@ class PromptManager:
         :return: a boolean value of true if user responds yes and a value of false if 'no' is entered
         """
         print()
-        popularity = self.response
+        popularity = self.response['message']
         llm_prompt = "Identify whether the response that is delimited by the triple backticks indicates that popular music would be preferred or not based on whether the response is positive or negative. " \
                     "A neutral or positive response indicates popular music is preferred, a negative response means popular music is not preferred. " \
                     "Format the response as a json string in the following format: {\"popularity\": POPULARITY} where POPULARITY is either true or false. " \
@@ -280,7 +295,7 @@ class PromptManager:
         :return: a boolean value that is True if the user wants to continue, and False if not
         """
         print()
-        cont = self.response
+        cont = self.response['message']
         llm_prompt = "Identify whether the response that is delimited by the triple backticks indicates that the search should continue or not based on whether the response is positive or negative. " \
                     "A neutral or positive response indicates the search should continue, a negative response means the search should not continue. " \
                     "Format the response as a json string in the following format: {\"cont\": CONT} where CONT is either true or false. " \
@@ -307,7 +322,7 @@ class PromptManager:
 
     def feels_prompt(self):
         print("")
-        uttr = self.response
+        uttr = self.response['message']
 
         attr_list = get_attribute_numbers(uttr)
 
@@ -322,7 +337,7 @@ class PromptManager:
         specifics = []
 
         print()
-        user_in = self.response
+        user_in = self.response['message']
         llm_prompt = "Identify any specific song titles, artists, albums, and genres from the given response that is delimited by the triple backticks. " \
                     "Format the response as a json string in the following format: {\"songs\": SONGS, \"artists\": ARTISTS, \"albums\": ALBUMS, \"genres\": GENRES}. " \
                     "If there are no songs, artists, albums, or genres identified in the response or the response is irrelevant, empty or invalid return a json string in the following format: {\"response\":  -1}. " \
